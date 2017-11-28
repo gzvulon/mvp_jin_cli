@@ -29,6 +29,7 @@ def run_server_script(jenkins, name, **params):
         params_line = "def params = [{}]\n".format(
             ', '.join("'{0}': '{1}'".format(*r) for r in params.items()))
         script = params_line + script
+        logging.debug(script)
     logging.debug("running: {}".format(filename))
     info = jenkins.run_script(script)
     return _clean_server_script_output(info)
@@ -48,14 +49,28 @@ class JobMenu(object):
                 results = (job.fullname for job in all_jobs)
             else:
                 results = run_server_script(
-                    self._jenkins, 'get_jobs_names.groovy')
+                    self._jenkins, 'jobs_transform.groovy',
+                    action='list', pattern='.*')
         else:
             results = run_server_script(
                 self._jenkins, 'list_running_jobs.groovy')
         return "\n".join(results)
 
-    def create(self):
-        results = run_server_script(self._jenkins, 'create_job.groovy')
+    def create(self, script_content):
+        results = run_server_script(
+            self._jenkins, 'create_job.groovy',
+            scriptContent=script_content)
+        return "\n".join(results)
+
+    def delete(self, pattern):
+        results = run_server_script(
+            self._jenkins, 'jobs_transform.groovy',
+            action='delete', pattern=pattern)
+        return "\n".join(results)
+
+    def transform(self, action, pattern):
+        results = run_server_script(self._jenkins, 
+            'jobs_transform.groovy', action=action, pattern=pattern)
         return "\n".join(results)
 
     def init(self):
