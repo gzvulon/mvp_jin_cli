@@ -54,6 +54,13 @@ class JobMenu(object):
                 self._jenkins, 'list_running_jobs.groovy')
         return "\n".join(results)
 
+    def create(self):
+        results = run_server_script(self._jenkins, 'create_job.groovy')
+        return "\n".join(results)
+
+    def init(self):
+        results = run_server_script(self._jenkins, 'init_self_check.groovy')
+        return "\n".join(results)
 
     def run(self, jobname):
         info = self._jenkins.invoke_job(jobname, #parameters,
