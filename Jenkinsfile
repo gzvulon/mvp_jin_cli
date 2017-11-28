@@ -22,5 +22,5 @@ pipeline {
                 sh('./tools/jin job list')
             }
         }
-        
+    }
 }
